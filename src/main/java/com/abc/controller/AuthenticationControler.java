@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.abc.request.AuthenticationRequest;
 import com.abc.request.RegisterRequest;
 import com.abc.response.AuthenticationResponse;
 import com.abc.service.AuthenticateService;
@@ -25,5 +26,9 @@ public class AuthenticationControler {
 		return ResponseEntity.ok(authenticationResponse);
 
 	}
-
+	
+	@PostMapping("authenticate")
+	public ResponseEntity<AuthenticationResponse> athenticate(@RequestBody AuthenticationRequest authenticationRequest){
+		return ResponseEntity.ok(authenticateService.authenticate(authenticationRequest));
+	}
 }
