@@ -20,12 +20,3 @@ public class RegisterRequest {
 	private Role role;
 
 }
-/*Json Object
-{
-"firstName": "John",
-"lastName": "Doe",
-"email": "john.doe@example.com",
-"password": "secretpassword",
-"role": "MEMBER"
-}
-*/
