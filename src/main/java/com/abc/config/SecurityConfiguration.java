@@ -1,5 +1,9 @@
 package com.abc.config;
 
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -7,17 +11,17 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.abc.enums.Role;
+import static com.abc.enums.Permission.*;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
+@RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfiguration {
 	
@@ -32,14 +36,15 @@ public class SecurityConfiguration {
 						.requestMatchers("/users/v1/authentication/*")
 						.permitAll()// White-listing the specified URL pattern
 						
-						.requestMatchers("/users/v1/management/**")
-						.hasAnyRole(Role.ADMIN.name(),Role.MEMBER.name())
+						.requestMatchers("/users/v1/management/**").hasAnyRole(Role.ADMIN.name(),Role.MEMBER.name())
 						
+						.requestMatchers(GET, "/users/v1/management/**").hasAnyAuthority(ADMIN_READ.name(), MEMBER_READ.name())
+                        .requestMatchers(POST, "/users/v1/management/**").hasAnyAuthority(ADMIN_CREATE.name(), MEMBER_CREATE.name())
 						
 						.anyRequest()// All other URLs require authentication
 						.authenticated())
 				
-			.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.sessionManagement(session->session.sessionCreationPolicy(STATELESS))
 			.authenticationProvider(authenticationProvider)
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 			.build();
