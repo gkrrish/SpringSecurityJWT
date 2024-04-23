@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -43,4 +45,29 @@ public class JwtService {
 		//MEMBER, ADMIN
 		return String.join(",", authoritiesSet);
 	}
+	
+	private Claims extractAllClaims(String token) {
+		return Jwts
+					.parserBuilder()
+					.setSigningKey(getSigningKey())
+					.build()
+					.parseClaimsJws(token)
+					.getBody();
+		
+	}
+
+	public String extractUserName(String token) {
+		return extractClaim(token, Claims::getSubject);
+	}
+
+	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+		final Claims claims = extractAllClaims(token);
+		return claimsResolver.apply(claims);
+	}
+
+	public boolean isTokenValid(String token, UserDetails userDetails) {
+		final String username = extractUserName(token);
+		return (username.equals(userDetails.getUsername()));
+	}
+	
 }
