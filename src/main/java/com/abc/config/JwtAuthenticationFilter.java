@@ -43,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			jwt = authenticationHeader.substring(7);
 			email = jwtService.extractUserName(jwt);
+			
 			if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
 				
@@ -58,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected boolean shouldNotFilter(
 			@NonNull HttpServletRequest request) throws ServletException {
 		
-		return request.getServletPath().contains("/users/v1/authentication/*");
+		return request.getServletPath().contains("/users/v1/authentication/");
 	}
 	
 }
